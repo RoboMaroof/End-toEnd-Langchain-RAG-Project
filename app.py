@@ -83,16 +83,21 @@ def create_rag_chain(model):
         print("⚠️ Warning: FAISS Vector Store is missing. Please run /vectordb/create first.")
         return RunnableLambda(lambda x: {"output": "Error: Vector Store not initialized. Please run /vectordb/create."})
     
-    retriever = vectors.as_retriever()
-    
-    return (
-        {
-            "context": lambda x: retriever.get_relevant_documents(x["input"]),
-            "input": itemgetter("input"),
+    retriever = vectors.as_retriever(search_kwargs={"k": 5})  # Retrieve top 5 sections
+
+    def retrieve_and_generate_response(inputs):
+        retrieved_docs = retriever.get_relevant_documents(inputs["input"])
+        retrieved_texts = [doc.page_content for doc in retrieved_docs]  # Extract content
+        
+        response = model.invoke(prompt.format(context="\n\n".join(retrieved_texts), input=inputs["input"]))
+        print("Response: ", response)
+        print("retrieved_sections: ", retrieved_texts)
+        return {
+            "output": response,
+            "retrieved_sections": retrieved_texts
         }
-        | prompt
-        | model
-    )
+
+    return RunnableLambda(retrieve_and_generate_response)
 
 create_vector_store()
 
