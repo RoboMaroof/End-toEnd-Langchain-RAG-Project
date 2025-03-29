@@ -4,6 +4,9 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain_community.llms import Ollama
 from langchain_groq import ChatGroq
 
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain_cohere import CohereRerank
+
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -50,7 +53,7 @@ def create_vector_store():
 
 def load_vector_store(load_path):
     """Load FAISS vector store from disk if available, otherwise return None."""
-    # global vectors  # Ensure vectors is accessible globally
+
     if os.path.exists(load_path):
         print("path exists")
         vectors = FAISS.load_local(load_path, OpenAIEmbeddings(), allow_dangerous_deserialization=True)
@@ -59,9 +62,9 @@ def load_vector_store(load_path):
         print(f"FAISS vector store not found at {load_path}. Please create it first.")
         return None
 
-
-model = ChatOpenAI(model="gpt-4o-mini")   #gpt-3.5-turbo"
-##ollama 
+# OpenAI
+model = ChatOpenAI(model="gpt-4o-mini")
+# Ollama 
 llm = Ollama(model="gemma3:1b")
 # ToDo Groq
 
@@ -85,8 +88,15 @@ def create_rag_chain(model):
     
     retriever = vectors.as_retriever(search_kwargs={"k": 5})  # Retrieve top 5 sections
 
+    # Reranking
+    compressor = CohereRerank(model="rerank-english-v3.0")
+    reranking_retriever = ContextualCompressionRetriever(
+        base_compressor=compressor, 
+        base_retriever=retriever
+    )
+
     def retrieve_and_generate_response(inputs):
-        retrieved_docs = retriever.get_relevant_documents(inputs["input"])
+        retrieved_docs = reranking_retriever.get_relevant_documents(inputs["input"])    # Rerank retrieved docs
         retrieved_texts = [doc.page_content for doc in retrieved_docs]  # Extract content
         
         response = model.invoke(prompt.format(context="\n\n".join(retrieved_texts), input=inputs["input"]))

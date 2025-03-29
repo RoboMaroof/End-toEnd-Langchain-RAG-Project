@@ -4,6 +4,7 @@ import streamlit as st
 if 'vector_store_ready' not in st.session_state:
     st.session_state.vector_store_ready = False
 
+# OpenAI
 def get_openai_response(input_text):
     response = requests.post(
         "http://localhost:8000/openai/invoke",
@@ -12,6 +13,7 @@ def get_openai_response(input_text):
     result = response.json()
     return result["output"]["output"]["content"], result["output"]["retrieved_sections"]
 
+# Ollama
 def get_ollama_response(input_text):
     response = requests.post(
         "http://localhost:8000/ollama/invoke",
@@ -22,19 +24,18 @@ def get_ollama_response(input_text):
     return result["output"]["output"], result["output"]["retrieved_sections"]
 
 
-## streamlit framework
+# Streamlit framework
 st.title('Langchain RAG App')
 
-# Dropdown or radio button for model selection
+# Model selection
 model_choice = st.selectbox(
     "Choose a model:",
     ("openai", "ollama"),
-    index=0  # Default to OpenAI
+    index=1  # Default to ollama
 )
 
 input_text = st.text_input("Enter your query:")
 
-# Button to submit the query
 if st.button("Get Response"):
     if input_text:
         if model_choice == "openai":
