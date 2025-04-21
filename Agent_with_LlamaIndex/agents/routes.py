@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 from langchain.agents import initialize_agent
 from langchain_community.chat_models import ChatOpenAI
 from .tools import get_tools
+from ingestion.index_builder import load_index
+
 
 router = APIRouter()
 model = ChatOpenAI(model="gpt-4o-mini")
@@ -12,7 +14,7 @@ def run_agent(inputs: dict):
     agent = initialize_agent(
         tools,
         model,
-        agent_type="openai-tools",
+        agent_type="openai-tools", 
         verbose=True,
         handle_parsing_errors=True,
         return_intermediate_steps=True
@@ -20,3 +22,13 @@ def run_agent(inputs: dict):
     result = agent.invoke({"input": inputs["input"]})
     tool_names = [action.tool for action, _ in result.get("intermediate_steps", [])]
     return {"output": result["output"], "tool_used": tool_names}
+
+
+@router.post("/openai/debug/retrieve")
+def debug_retrieve(query: str = Body(...)):
+    index = load_index()
+    if not index:
+        return {"error": "Vector index not loaded."}
+    retriever = index.as_retriever(similarity_top_k=5)
+    results = retriever.retrieve(query)
+    return {"results": [r.get_text() for r in results]}

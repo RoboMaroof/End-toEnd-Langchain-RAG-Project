@@ -15,18 +15,18 @@ source_type = st.selectbox("Select data source type:", ["website", "docs", "sql"
 if source_type  == "website":
     source_path = st.text_input("Enter URL path:")
 
-    if st.button("Ingest and Create Vector Store"):
+    if st.button("Ingest and Update Vector Store"):
         if source_path:
-            with st.spinner("Ingesting and creating vector store..."):
+            with st.spinner("Ingesting and updating vector store..."):
                 response = requests.post(f"{BASE_URL}/vectordb/create", json={
                     "source_type": source_type,
                     "source_path": source_path
                 })
                 if response.ok and "message" in response.json():
-                    st.success("✅ Vector store created successfully!")
+                    st.success("✅ Vector store updated successfully!")
                     st.session_state.vector_store_ready = True
                 else:
-                    st.error(f"❌ Failed to create vector store. {response.json().get('error', '')}")
+                    st.error(f"❌ Failed to update vector store. {response.json().get('error', '')}")
         else:
             st.warning("⚠️ Please enter a valid source path.")
 

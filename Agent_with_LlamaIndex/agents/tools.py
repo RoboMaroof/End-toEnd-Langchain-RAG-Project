@@ -10,11 +10,13 @@ def get_tools():
     tools.append(ArxivQueryRun(api_wrapper=ArxivAPIWrapper(top_k_results=1, doc_content_chars_max=200)))
 
     index = load_index()
+    retriever = index.as_retriever(similarity_top_k=5)
+
     if index:
         retriever_tool = Tool(
             name="vector_retriever",
-            func=lambda q: index.as_retriever().retrieve(q),
-            description="Useful for answering questions from ingested sources."
+            func=lambda q: "\n\n".join([n.get_text() for n in index.as_retriever(similarity_top_k=5).retrieve(q)]),
+            description="Useful for answering questions from uploaded documents, websites, or SQL databases such as FAQs, company data, policies, etc."
         )
         tools.append(retriever_tool)
 

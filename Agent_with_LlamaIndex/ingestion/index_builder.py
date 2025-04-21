@@ -10,6 +10,13 @@ logging.basicConfig(level=logging.INFO)
 
 def create_index(source_type, source_path):
     documents = get_documents(source_type, source_path)
+
+    ###########
+    print("[DEBUG] Sample ingested documents:")
+    for doc in documents[:2]:
+        print(doc.text[:300])
+    ###########
+
     splitter = SentenceSplitter(chunk_size=512, chunk_overlap=50)
     nodes = splitter.get_nodes_from_documents(documents)
 
