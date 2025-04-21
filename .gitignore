@@ -3,6 +3,11 @@ __pycache__/
 *.pyc
 *.pyo
 
+*.db
+*.pdf
+
+.vscode/
+
 # Virtual environment (if using venv instead of conda)
 venv/
 
