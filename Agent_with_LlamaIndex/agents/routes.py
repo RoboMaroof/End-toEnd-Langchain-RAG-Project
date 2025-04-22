@@ -35,7 +35,10 @@ def run_agent(inputs: dict):
         }
 
         if action.tool == "vector_retriever":
-            retrieved_chunks.extend(action.tool_input.split("\n\n"))
+            retrieved_chunks.extend([
+                {"text": chunk["text"], "score": chunk["score"]}
+                for chunk in observation if isinstance(observation, list) and isinstance(chunk, dict)
+            ])
 
         intermediate_steps.append(step_detail)
 
