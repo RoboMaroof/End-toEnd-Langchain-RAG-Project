@@ -2,10 +2,13 @@ from fastapi import APIRouter, Body, UploadFile, File
 from .index_builder import create_index
 from .upload_handler import save_uploaded_file
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+env_path = Path(__file__).resolve().parents[1]/'.env'
+load_dotenv(dotenv_path=env_path)
 os.environ['OPENAI_API_KEY']=os.getenv("OPENAI_API_KEY")
+UPLOADED_DOCS_FOLDER = os.getenv("UPLOADED_DOCS_FOLDER")
 
 router = APIRouter()
 
@@ -24,7 +27,7 @@ def upload_and_ingest(file: UploadFile = File(...)):
 
         # TODO all types
         # Assume it's a docs ingestion
-        create_index("docs", "uploads/")
+        create_index("docs", UPLOADED_DOCS_FOLDER)
 
         return {"message": f"Uploaded and indexed file: {file.filename}"}
     except Exception as e:

@@ -10,7 +10,6 @@ def get_tools():
     tools.append(ArxivQueryRun(api_wrapper=ArxivAPIWrapper(top_k_results=1, doc_content_chars_max=200)))
 
     index = load_index()
-    retriever = index.as_retriever(similarity_top_k=5)
 
     if index:
         retriever_tool = Tool(

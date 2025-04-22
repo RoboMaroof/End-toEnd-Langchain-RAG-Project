@@ -63,6 +63,14 @@ if st.button("🔍 Get Response"):
                 if tools_used:
                     st.markdown(f"### 🛠 Tools Used:")
                     st.write(tools_used)
+
+                if "intermediate_steps" in data and data["intermediate_steps"]:
+                    st.markdown("### 🔎 Intermediate Agent Steps:")
+                    for idx, step in enumerate(data["intermediate_steps"], 1):
+                        st.markdown(f"**Step {idx}: Tool - `{step['tool']}`**")
+                        st.markdown(f"- **Input:** `{step['input']}`")
+                        st.markdown(f"- **Observation:** `{step['observation']}`")
+
             else:
                 st.error(f"❌ Error retrieving response. {response.text}")
     else:
