@@ -6,12 +6,13 @@
 
 ## 🧰 Tech Stack
 
-- **🧠 LLMs**: OpenAI, Ollama
+- **🧠 LLMs**: OpenAI, Ollama, Grok
 - **🛠 Frameworks**: LangChain, FastAPI, Streamlit
 - **🔍 Retrieval**: FAISS (vector store), OpenAI Embeddings
-- **📄 Data**: Web scraping using `WebBaseLoader`
+- **📄 Data Ingestion**: Web(`WebBaseLoader`), SQL, PDF
 - **📚 Reranking**: Cohere Rerank API
-- **🤖 Agent Tools**: Wikipedia, Arxiv, LangSmith retriever
+- **🤖 APIs**: Wikipedia, Arxiv
+- **🤖 Agent Tools**: Langchain, LangGraph, LlamaIndex, LangSmith retriever
 - **🔐 Secrets**: `dotenv`
 
 ---
