@@ -53,59 +53,67 @@ with st.expander("📥 Ingest Custom Data into Vector Store (if required)", expa
 st.markdown("---")
 st.markdown("## 🤖 Ask a Question")
 
-model_choice = st.selectbox("Choose a model:", ("openai",), index=0)
-input_text = st.text_input("Enter your question:")
+model_label_map = {
+    "OpenAI (gpt-4o-mini)": "openai:gpt-4o-mini",
+    "Groq (qwen-qwq-32b)": "groq:qwen-qwq-32b"
+}
+model_choice_label = st.selectbox("Choose a model:", list(model_label_map.keys()))
+model_choice = model_label_map[model_choice_label]
 
+input_text = st.text_input("Enter your question:")
 if st.button("🔍 Get Response"):
     if input_text.strip():
         with st.spinner("Thinking..."):
-            endpoint = f"/{model_choice}/agent/invoke"
-            response = requests.post(f"{BASE_URL}{endpoint}", json={"input": {"input": input_text}})
-            if response.ok:
-                data = response.json()
+            endpoint = f"{BASE_URL}/agent/invoke"
+            response = requests.post(
+                endpoint, 
+                json={
+                    "input": {"input": input_text},
+                    "model": model_choice
+                },               
+            )
+            response.raise_for_status()
+            data = response.json()
 
-                # Final Output
-                if "final_output" in data:
-                    st.markdown(f"**🧠 Response:**\n\n{data['final_output']}")
+            # Final Output
+            if "final_output" in data:
+                st.markdown(f"**🧠 Response:**\n\n{data['final_output']}")
 
-                # Tools Used
-                if "tools_used" in data and data["tools_used"]:
-                    with st.expander("🛠 Tools Used"):
-                        for tool in data["tools_used"]:
-                            st.markdown(f"- {tool}")
+            # Tools Used
+            if "tools_used" in data and data["tools_used"]:
+                with st.expander("🛠 Tools Used"):
+                    for tool in data["tools_used"]:
+                        st.markdown(f"- {tool}")
 
-                # Retrieved Data
-                if "retrieved_chunks" in data and data["retrieved_chunks"]:
-                    with st.expander("📄 Retrieved Data"):
-                        for i, chunk in enumerate(data["retrieved_chunks"], start=1):
-                            tool = chunk.get("tool", "Unknown")
-                            ctype = chunk.get("type", "text")
-                            content = chunk.get("data", "")
-                            st.markdown(f"**Tool**: `{tool}` | **Type**: `{ctype}`")
-                            st.code(content if isinstance(content, str) else str(content))
+            # Retrieved Data
+            if "retrieved_chunks" in data and data["retrieved_chunks"]:
+                with st.expander("📄 Retrieved Data"):
+                    for i, chunk in enumerate(data["retrieved_chunks"], start=1):
+                        tool = chunk.get("tool", "Unknown")
+                        ctype = chunk.get("type", "text")
+                        content = chunk.get("data", "")
+                        st.markdown(f"**Tool**: `{tool}` | **Type**: `{ctype}`")
+                        st.code(content if isinstance(content, str) else str(content))
 
-                # Intermediate Steps
-                if "intermediate_steps" in data and data["intermediate_steps"]:
-                    with st.expander("🔎 Intermediate Steps"):
-                        for idx, step in enumerate(data["intermediate_steps"], 1):
-                            step_type = step.get("type", "unknown")
-                            st.markdown(f"**Step {idx}**: `{step_type}`")
-                            if step_type == "ai_tool_call":
-                                st.markdown(f"- Tool: `{step.get('tool')}`")
-                                st.markdown(f"- Arguments: `{step.get('args')}`")
-                            elif step_type == "tool_response":
-                                st.markdown(f"- Tool: `{step.get('tool')}`")
-                                st.markdown("```")
-                                st.markdown(step.get("content", ""))
-                                st.markdown("```")
-                            elif step_type == "ai_final_response":
-                                st.markdown("**Final Response:**")
-                                st.markdown(step.get("content", ""))
-                            else:
-                                st.markdown(f"- Content: `{step.get('content', '')}`")
+            # Intermediate Steps
+            if "intermediate_steps" in data and data["intermediate_steps"]:
+                with st.expander("🔎 Intermediate Steps"):
+                    for idx, step in enumerate(data["intermediate_steps"], 1):
+                        step_type = step.get("type", "unknown")
+                        st.markdown(f"**Step {idx}**: `{step_type}`")
+                        if step_type == "ai_tool_call":
+                            st.markdown(f"- Tool: `{step.get('tool')}`")
+                            st.markdown(f"- Arguments: `{step.get('args')}`")
+                        elif step_type == "tool_response":
+                            st.markdown(f"- Tool: `{step.get('tool')}`")
+                            st.markdown("```")
+                            st.markdown(step.get("content", ""))
+                            st.markdown("```")
+                        elif step_type == "ai_final_response":
+                            st.markdown("**Final Response:**")
+                            st.markdown(step.get("content", ""))
+                        else:
+                            st.markdown(f"- Content: `{step.get('content', '')}`")
 
-
-            else:
-                st.error(f"❌ Error retrieving response. {response.text}")
     else:
         st.warning("⚠️ Please enter a question.")
