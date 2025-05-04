@@ -20,7 +20,6 @@ def get_ollama_response(input_text):
         json={'input': {'input': input_text}} 
     )
     result = response.json()
-    print(result)
     return result["output"]["output"], result["output"]["retrieved_sections"]
 
 
@@ -47,7 +46,7 @@ if st.button("Get Response"):
             st.write(f"**Response from {model_choice.capitalize()}:**")
             st.write(response)
 
-            st.write("### Top 5 Retrieved Sections:")
+            st.write("### Top Retrieved Sections:")
             for i, section in enumerate(retrieved_sections, 1):
                 with st.expander(f"Section {i}"):
                     st.write(section)

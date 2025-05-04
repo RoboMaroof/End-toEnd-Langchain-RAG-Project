@@ -20,14 +20,15 @@ from fastapi import FastAPI
 import uvicorn
 
 import os
-from operator import itemgetter
+from pathlib import Path
 from dotenv import load_dotenv
 
-
-load_dotenv()
-
+env_path = Path(__file__).resolve().parents[1]/'.env'
+print(env_path)
+load_dotenv(dotenv_path=env_path)
 os.environ['OPENAI_API_KEY']=os.getenv("OPENAI_API_KEY")
-VECTORDB_PATH = "faiss_index"
+os.environ['CO_API_KEY']=os.getenv("CO_API_KEY")
+VECTORDB_PATH = os.getenv("VECTORDB_PATH")
 
 app=FastAPI(
     title="Langchain Server",

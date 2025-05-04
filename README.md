@@ -1,10 +1,11 @@
-# 🔗 End-to-End LangChain RAG + Agent Project
+# 🔗 LangChain-Powered RAG & Agent Chat App Suite
 
 > A progressive suite of apps demonstrating Retrieval-Augmented Generation (RAG) and Agent-based orchestration using LangChain, LlamaIndex, and LangGraph.
+> Detailed README files in respective directories.
 
 ---
 
-## 🧠 Tech Stack
+## Tech Stack
 
 - **LLMs**: OpenAI, Groq, Ollama
 - **Frameworks**: LangChain, LangGraph, LlamaIndex, FastAPI, Streamlit
@@ -16,7 +17,7 @@
 
 ---
 
-## 📚 Project Progression
+## Project Progression
 
 | Folder                          | Description                                               |
 |---------------------------------|-----------------------------------------------------------|
@@ -27,7 +28,7 @@
 
 ---
 
-## 🚀 Final Project: `04_Agent_LangGraph`
+## Final Project: `04_Agent_LangGraph`
 
 ### Features
 
@@ -48,7 +49,7 @@ uvicorn app:app --reload
 streamlit run client.py
 ```
 
-Ensure .env file has:
+### Configure `.env` File
 ```env
 OPENAI_API_KEY=your_key
 API_BASE_URL=http://localhost:8000
@@ -59,7 +60,9 @@ SQL_DB_PATH=./data/faq_knowledge.db
 
 ---
 
-## 📸 Screenshots
+## Screenshots
+
+Below are screenshots from the final LangGraph-powered agent app:
 
 ![App Screenshot](/mnt/04_LangGraph_1.png)
 ![App Screenshot](/mnt/04_LangGraph_2.png)
